@@ -1,0 +1,341 @@
+var questionNumber = 1;
+var currentScene = 1;
+var confetties = []; 
+
+var Confetti = function(x, y, w, h, col, WIDTH, HEIGHT, vx, vy, speed) {
+    this.speed = speed || random(10);
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.spin = random(-10,10);
+    this.h = h;
+    this.col = col;
+    this.WIDTH = WIDTH;
+    this.HEIGHT = HEIGHT;
+    this.vx = vx;
+    this.r = random(0,360);
+    this.vy = vy;
+    this.randVel = random(1, 5);
+};
+Confetti.prototype.draw = function() {
+    
+    //this.w = 0 + sin(frameCount*1)*this.WIDTH;
+    
+    this.h = 0 + cos(frameCount*this.speed)*this.HEIGHT;
+    this.r += this.spin;
+    pushMatrix();
+    translate(this.x,this.y);
+    rotate(this.r);
+    fill(this.col);
+    noStroke();
+    quad(-this.w/2, -this.h/2, -this.w/2 + this.w, -this.h/2, -this.w/2 + (this.w * 1.5), -this.h/2 + this.h, -this.w/2 + (this.w * 0.5), -this.h/2 + this.h);
+    popMatrix();
+};
+
+Confetti.prototype.fall = function() {
+    this.x += this.vx;
+    this.y += this.vy;
+};
+
+var Button = function(config) {
+    this.x = config.x || 4;
+    this.y = config.y || -19;
+    this.width = config.width || 56;
+    this.height = config.height || 50;
+    this.label = config.label || "Start";
+    this.onClick = config.onClick || function() {};
+};
+
+Button.prototype.draw = function() {
+    fill (252, 111, 153);
+    noStroke();
+    rect(this.x, this.y, this.width, this.height, 5);
+    fill(0, 0, 0);
+    textSize(19);
+    textAlign(LEFT, TOP);
+    text(this.label, this.x+10, this.y+this.height/4);
+};
+
+Button.prototype.isMouseInside = function() {
+    return mouseX > this.x &&
+           mouseX < (this.x + this.width) &&
+           mouseY > this.y &&
+           mouseY < (this.y + this.height);
+};
+
+Button.prototype.handleMouseClick = function() {
+    if (this.isMouseInside()) {
+        this.onClick();
+    }
+};
+
+var btn1 = new Button({
+    x: 183,
+    y: 301,
+    label: "Start",
+    onClick: function() {
+        currentScene = 2;
+    }
+});
+var drawBody = function (bodyX,bodyY,size)
+{
+noStroke();
+    size = size/100;
+fill (125, 65, 0); // skin tone
+ellipse (size*100+bodyX,size*100+bodyY,83*size,100*size); // head
+fill (255,255,255);
+
+fill (13, 12, 12); // hair color
+quad (bodyX+105*size, bodyY+53*size,bodyX+61*size, bodyY+128*size, bodyX+28*size, bodyY+170*size,bodyX+38*size,bodyY+57*size); // left hair
+quad (bodyX+168*size, bodyY+154*size,bodyX+188*size, bodyY+83*size, bodyX+113*size,bodyY+52*size,bodyX+106*size,bodyY+66*size); // right hair
+ellipse (bodyX+99*size, bodyY+61*size, 60*size, 24*size); // top hair
+
+fill (5, 5, 5); // eye color
+ellipse (bodyX+90*size,bodyY+100*size,10*size,10*size); // left eye
+ellipse (bodyX+117*size,bodyY+100*size,10*size,10*size); // right eye
+
+stroke(20, 18, 18); // nose line
+fill (100, 50, 0); // nose color
+bezier (bodyX+100*size,bodyY+100*size,bodyX+121*size,bodyY+122*size,bodyX+92*size,bodyY+120*size,bodyX+96*size,bodyY+115*size); // nose
+
+//fill (245, 233, 233); // teeth
+arc (bodyX+103*size, bodyY+125*size, 30*size, 13*size, 1, 180); // mouth 
+//line (86, 124, 119, 124); // top of mouth
+
+};
+// DRAW SHIRT
+var drawShirt = function (bodyX,bodyY,size)
+{
+    size = size/100;
+fill (20, 18, 20); // tshirt color
+rect(bodyX+70*size, bodyY+148*size, 60*size, 60*size); // t shirt
+triangle(bodyX+103*size, bodyY+148*size, bodyX+56*size, bodyY+186*size,bodyX+ 71*size, bodyY+148*size); // left sleeve
+triangle (bodyX+95*size,bodyY+148*size,bodyX+130*size,bodyY+148*size,bodyX+147*size,bodyY+186*size); // right sleeve
+};
+
+// DRAW BODY
+var drawBitmoji = function (bodyX,bodyY,size){
+    drawBody (bodyX,bodyY, size);
+    drawShirt (bodyX,bodyY, size);
+};
+var drawbitmoji = function(xPos,yPos,bitmojiHeight)
+{
+// draw bitmojiHead 
+noStroke();
+fill(158, 89, 14); //fill to skin tone
+ellipse(xPos,yPos,bitmojiHeight/100*83,bitmojiHeight/100*100); //head
+fill(255, 255, 255);
+arc(xPos-(bitmojiHeight/100*42),yPos+(bitmojiHeight/100*37),bitmojiHeight/100*28,bitmojiHeight/100*49,0,361); //left chisel
+arc(xPos+(bitmojiHeight/100*42),yPos+(bitmojiHeight/100*37),bitmojiHeight/100*28,bitmojiHeight/100*47,0,361);// right chisel
+
+//hair
+fill(0, 0, 0);//grey hair
+ellipse (xPos-(bitmojiHeight/100*30),yPos-(bitmojiHeight/100*46),bitmojiHeight/100*74,bitmojiHeight/100*70);// left puff
+ellipse (xPos+(bitmojiHeight/100*40),yPos-(bitmojiHeight/100*46),bitmojiHeight/100*74,bitmojiHeight/100*70);// right puff
+ellipse (xPos+(bitmojiHeight/100*700),yPos-(bitmojiHeight/100*2),bitmojiHeight/100*40,bitmojiHeight/100*300);//top puff
+//glasses
+ellipse (xPos,yPos-(bitmojiHeight/100*37),bitmojiHeight/100*62,bitmojiHeight/100*28);//black for glasses
+stroke(0,0,0); //stroke for glasses
+fill(158,89,14); //fill to skin tone for around eye in glasses
+ellipse(xPos-(bitmojiHeight/100*15),yPos,bitmojiHeight/100*25,bitmojiHeight/100*14);//glasses left
+ellipse(xPos+(bitmojiHeight/100*18),yPos,bitmojiHeight/100*25,bitmojiHeight/100*14); //glasses right
+line(xPos+(bitmojiHeight/100*5),yPos-(bitmojiHeight/100*2),xPos-(bitmojiHeight/100*2),yPos-(bitmojiHeight/100*2)); //glasses nose bridge
+line(xPos-(bitmojiHeight/100*41),yPos-(bitmojiHeight/100*5),xPos-(bitmojiHeight/100*25),yPos-(bitmojiHeight/100*2)); //glasses side left
+line(xPos+(bitmojiHeight/100*28),yPos-(bitmojiHeight/100*2),xPos+(bitmojiHeight/100*41),yPos-(bitmojiHeight/100*50)); //glasses side right
+
+//Eyes
+fill(115, 23, 23); //brown eyes fill
+ellipse (xPos-(bitmojiHeight/100*10),yPos,bitmojiHeight/100*6,bitmojiHeight/100*4); //left eye
+ellipse (xPos+(bitmojiHeight/100*17),yPos,bitmojiHeight/100*6,bitmojiHeight/100*4); //right eye
+
+//Nose
+fill(156, 90, 19); //fill to skin tone
+bezier (xPos,yPos,xPos+(bitmojiHeight/100*21),yPos+(bitmojiHeight/100*22),xPos-(bitmojiHeight/100*8),yPos+(bitmojiHeight/100*20),xPos-(bitmojiHeight/100*4),yPos+(bitmojiHeight/100*15)); //nose
+
+//Mouth
+fill (255,255,255);//white fill for teeth
+arc(xPos+(bitmojiHeight/100*3), yPos+(bitmojiHeight/100*25), bitmojiHeight/100*30, bitmojiHeight/100*13,1, 180);// mouth
+line(xPos-(bitmojiHeight/100*14),yPos+(bitmojiHeight/100*24),xPos+(bitmojiHeight/100*19),yPos+(bitmojiHeight/100*24)); //top of mouth
+
+
+//Cap
+fill(242, 233, 233);//cap color
+quad(xPos-(bitmojiHeight/100*10),yPos-(bitmojiHeight/100*40),xPos+(bitmojiHeight/100*48),yPos-(bitmojiHeight/100*13),xPos+(bitmojiHeight/100*74),yPos-(bitmojiHeight/100*75),xPos+(bitmojiHeight/100*9),yPos-(bitmojiHeight/100*90));//cap
+fill(222, 139, 31); //cap lines
+line(xPos+(bitmojiHeight/100*44),yPos+(bitmojiHeight/100*39),xPos+(bitmojiHeight/100*48),yPos-(bitmojiHeight/100*24));// cap line one
+line(xPos+(bitmojiHeight/100*41),yPos+(bitmojiHeight/100*48),xPos+(bitmojiHeight/100*43),yPos-(bitmojiHeight/100*25));//cap line two
+line(xPos+(bitmojiHeight/100*51),yPos+(bitmojiHeight/100*39),xPos+(bitmojiHeight/100*48),yPos-(bitmojiHeight/100*23));//cap line three
+
+//Body
+fill(31, 25, 25);// gown color
+quad(xPos-(bitmojiHeight/100*13),yPos+(bitmojiHeight/100*88),xPos-(bitmojiHeight/100*64),yPos+(bitmojiHeight/100*84),xPos-(bitmojiHeight/100*47),yPos+(bitmojiHeight/100*25),xPos+(bitmojiHeight/100*8),yPos+(bitmojiHeight/100*63));//left gown
+quad(xPos+(bitmojiHeight/100*59),yPos+(bitmojiHeight/100*32),xPos+(bitmojiHeight/100*63),yPos+(bitmojiHeight/100*93),xPos-(bitmojiHeight/100*9),yPos+(bitmojiHeight/100*87),xPos-(bitmojiHeight/100*15),yPos+(bitmojiHeight/100*48));// right gown
+fill(255, 179, 0);//strap
+rect(xPos-(bitmojiHeight/100*31),yPos+(bitmojiHeight/100*34),bitmojiHeight/100*10,bitmojiHeight/100*114,23); //left strap
+rect(xPos+(bitmojiHeight/100*18),yPos+(bitmojiHeight/100*34),bitmojiHeight/100*10,bitmojiHeight/100*116,23); //right strap
+
+};
+
+var drawAbbyBitmoji = function(xPos,yPos,bitmojiHeight){
+    drawbitmoji(xPos,yPos,bitmojiHeight);
+};
+
+var currentScene2 = function (){
+    currentScene = 2;
+    background (252, 111, 153);
+fill(0, 0, 0);
+text(" What element are you?", 114,18);
+text(" What type of pet would you have as a pet?", 4,74);
+
+text(" a sky bison?", 5,102); 
+text(" water and moon spirits? ", 100,102); 
+};
+var currentScene3 = function (){
+    currentScene = 3;
+    background (252, 111, 153);
+fill(0, 0, 0);
+ text(" What do you like?", 4,50);
+ 
+text(" Peace? ", 3,102); 
+text(" Power? ", 123,102); 
+};
+var currentScene4 = function (){
+    currentScene=4;
+    background (252, 111, 153);
+fill(0, 0, 0);
+text(" Whats your favorite Season?", 4,74);
+
+        text(" Winter? ", 5,102); 
+        text(" Summer? ", 100,102); 
+};
+var currentScene5 = function (){
+    currentScene = 5;
+background (252, 111, 153);
+fill(255, 255, 255);
+ellipse(205,111,265,177);
+triangle(123,181,102,211,155,195);
+triangle(284,183,305,209,251,193);
+fill(13, 13, 13);
+text("Your Element is Air!!!", 110,79);
+image(getImage("space/beetleship"), 91, 69, 107, 102);
+drawAbbyBitmoji(47,240,72);
+ drawBitmoji (242, 159,86);
+};
+var currentScene6 = function (){
+    currentScene = 6;
+background (252, 111, 153);
+fill(255, 255, 255);
+ellipse(205,111,265,177);
+triangle(123,181,102,211,155,195);
+triangle(284,183,305,209,251,193);
+fill(13, 13, 13);
+text("Your Element is Fire!!!", 110,79);
+image(getImage("avatars/piceratops-ultimate"), 137, 90, 110, 119);
+drawAbbyBitmoji(47,240,72);
+ drawBitmoji (242, 159,86);
+};
+var currentScene7 = function (){
+currentScene = 7;
+background (252, 111, 153);
+fill(255, 255, 255);
+ellipse(205,111,265,177);
+triangle(123,181,102,211,155,195);
+triangle(284,183,305,209,251,193);
+fill(13, 13, 13);
+text("Your Element is Earth!!!", 113,79);
+image(getImage("space/planet"), 147, 96, 107, 102);
+drawAbbyBitmoji(47,240,72);
+ drawBitmoji (242, 159,86);
+};
+var currentScene8 = function (){
+    currentScene = 8;
+background (252, 111, 153);
+fill(255, 255, 255);
+ellipse(205,111,265,177);
+triangle(123,181,102,211,155,195);
+triangle(284,183,305,209,251,193);
+fill(13, 13, 13);
+text("Your Element is Water!!!", 110,79);
+image(getImage("avatars/aqualine-seed"), 134, 84, 116, 112);
+drawAbbyBitmoji(47,240,72);
+ drawBitmoji (242, 159,86);
+};
+var splashScreen = function (){
+    background (252, 111, 153); 
+var font = createFont("serif");
+fill (23, 22, 23);
+textFont(font);
+textSize(70);
+text ("Avatar", 106, -6);
+textSize(30);
+text("The Last Airbender", 80, 65);
+textSize(20);
+text ("Discover your bending abilities!", 77, 102);
+textSize (20);
+fill (18, 17, 18);
+text ("By: Nyla and Abraphine", 100, 366);
+btn1.draw();
+ drawAbbyBitmoji(121,210,79);
+ drawBitmoji (216, 103,90);
+};
+
+mouseClicked = function (){
+    if (currentScene === 1 ) {
+     btn1.handleMouseClick ();
+    }
+   else if (mouseX < 100 && questionNumber === 1) {
+      currentScene= 5;
+      questionNumber = 0;
+    } else if (mouseX > 100 && questionNumber === 1) {
+      currentScene=3;
+        questionNumber = 2; 
+    } else if (mouseX < 100 && questionNumber === 2) {
+       currentScene= 4;
+        questionNumber = 3;
+    } else if (mouseX > 100 && questionNumber === 2) {
+       currentScene=6; 
+     questionNumber = 0; 
+
+    } else if (mouseX > 100 && questionNumber === 3) {
+      currentScene=7;
+        questionNumber = 0;
+    } else if (mouseX < 100 && questionNumber === 3){
+    
+        currentScene=8;
+       questionNumber = 0;
+    }
+};
+
+var drawConfetti = function(){
+ for(var i = confetties.length - 1; i >= 0; i--) {
+        confetties[i].draw();
+        confetties[i].fall();
+        
+        if(confetties[i].x < -50 || confetties[i].x > 450 || confetties[i].y > 450) {
+            confetties.splice(i, 1);
+        }
+    }
+    if(confetties.length < 90) {
+        confetties.push( new Confetti(random(400), -200, random(-20, 20), 0, color(random(255), 255, 255), random(-30,30), random(-40,40), random(-3, 3), random(3, 10)));
+    }
+};
+draw = function () {
+    if (currentScene === 1) {
+        splashScreen();
+    }
+    
+     if (currentScene === 2) {currentScene2();
+     }
+     if (currentScene === 3) {currentScene3();
+     }
+     if (currentScene === 4) {currentScene4();
+     }
+     if (currentScene === 5) {currentScene5(); drawConfetti();
+     }
+      if (currentScene === 6) {currentScene6(); drawConfetti();
+     }
+    if (currentScene === 7) {currentScene7(); drawConfetti();
+     }
+     if (currentScene === 8) {currentScene8(); drawConfetti();
+     }
+ };
